@@ -13,8 +13,7 @@ MonoBehaviour:
   m_Name: RigidbodyMovable
   m_EditorClassIdentifier: 
   maxGroundAngle: 90
-  lerpSpeedMultiplier: 1
-  speed: 54.46
+  lerpSpeedMultiplier: 2
+  speed: 20
   lerpRotationSpeedMultiplier: 1
-  rotationSpeed: 90
-  stuckTime: 60
+  rotationSpeed: 30

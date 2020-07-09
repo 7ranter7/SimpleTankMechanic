@@ -4,8 +4,9 @@ using UnityEngine;
 
 public interface ICannon
 {
-    bool CanFire(Vector3 destination);
-    void Fire(Vector3 destination);
+    bool CanFire();
+    bool CanReach();
+    void Fire();
     Vector3 Rotate(Vector3 destination);
     List<Vector3> GetPath(int pointCount);
 }

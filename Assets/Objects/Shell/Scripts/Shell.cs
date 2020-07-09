@@ -4,12 +4,12 @@ using UnityEngine;
 
 public class Shell : MonoBehaviour, IShell
 {
+    [SerializeField] private LayerMask _groundColliders;
+    [SerializeField] private GameObject _effectPrefab;
     private Rigidbody _rigidbody;
 
     public void Fire(float startVelocity)
     {
-        Debug.Log("Shell fire");
-        //UnityEditor.EditorApplication.isPaused = true;
         _rigidbody.velocity = transform.forward * startVelocity;
     }
 
@@ -33,7 +33,13 @@ public class Shell : MonoBehaviour, IShell
     /// <param name="other">The Collision data associated with this collision.</param>
     void OnCollisionEnter(Collision other)
     {
-        Debug.Log("Destroy");
-        //Destroy(gameObject);
+        if (((1 << other.gameObject.layer) & _groundColliders.value) != 0)
+        {
+            if (_effectPrefab != null)
+            {
+                Instantiate(_effectPrefab, other.contacts[0].point, Quaternion.identity);
+            }
+            Destroy(gameObject);
+        }
     }
 }

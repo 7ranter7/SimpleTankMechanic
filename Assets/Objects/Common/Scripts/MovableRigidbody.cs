@@ -7,25 +7,25 @@ using UnityEngine;
 public class MovableRigidbody : MonoBehaviour, IMovable
 {
 
-    public LayerMask groundColliders;
-    public MovableRigidbodySettings settings;
+    [SerializeField] private LayerMask _groundColliders;
+    [SerializeField] private MovableRigidbodySettings _settings;
 
 
     private Rigidbody _rigidbody;
-    private int colissionCounter = 0;
-    private bool canMove = false;
-    private float stuckTimer = 0;
+    private int _colissionCounter = 0;
+    private bool _canMove = false;
+    //private float _stuckTimer = 0;
 
 
     public void Move(Vector3 axises)
     {
-        if (!canMove) return;
+        if (!_canMove) return;
         _rigidbody.velocity = Vector3.Lerp(_rigidbody.velocity,
-                                transform.forward * settings.speed * axises.z,
-                                Time.deltaTime * settings.lerpSpeedMultiplier);
+                                transform.forward * _settings.speed * axises.z,
+                                Time.deltaTime * _settings.lerpSpeedMultiplier);
         _rigidbody.rotation = Quaternion.Lerp(_rigidbody.rotation,
-                                _rigidbody.rotation * Quaternion.AngleAxis(axises.y * settings.rotationSpeed, transform.up),
-                                Time.deltaTime * settings.lerpRotationSpeedMultiplier);
+                                _rigidbody.rotation * Quaternion.AngleAxis(axises.y * _settings.rotationSpeed, transform.up),
+                                Time.deltaTime * _settings.lerpRotationSpeedMultiplier);
     }
 
     /// <summary>
@@ -44,10 +44,10 @@ public class MovableRigidbody : MonoBehaviour, IMovable
     /// <param name="other">The Collision data associated with this collision.</param>
     void OnCollisionEnter(Collision other)
     {
-        if (((1 >> other.gameObject.layer) & groundColliders) != 0)
+        if (((1 << other.gameObject.layer) & _groundColliders) != 0)
         {
-            canMove = canMove || Vector3.Angle(other.contacts[0].normal, Vector3.up) < settings.maxGroundAngle;
-            colissionCounter++;
+            _canMove = _canMove || Vector3.Angle(other.contacts[0].normal, Vector3.up) < _settings.maxGroundAngle;
+            _colissionCounter++;
         }
     }
 
@@ -58,13 +58,13 @@ public class MovableRigidbody : MonoBehaviour, IMovable
     /// <param name="other">The Collision data associated with this collision.</param>
     void OnCollisionExit(Collision other)
     {
-        if (((1 >> other.gameObject.layer) & groundColliders) != 0)
+        if (((1 << other.gameObject.layer) & _groundColliders) != 0)
         {
-            colissionCounter--;
-            if (colissionCounter <= 0)
+            _colissionCounter--;
+            if (_colissionCounter <= 0)
             {
-                colissionCounter = 0;
-                canMove = false;
+                _colissionCounter = 0;
+                _canMove = false;
             }
         }
     }
@@ -74,22 +74,22 @@ public class MovableRigidbody : MonoBehaviour, IMovable
     /// </summary>
     private void FixedUpdate()
     {
-        if (colissionCounter == 0 || Vector3.Angle(_rigidbody.transform.up, Vector3.up) > settings.maxGroundAngle)
+        /*if (_colissionCounter == 0 || Vector3.Angle(_rigidbody.transform.up, Vector3.up) > _settings.maxGroundAngle)
         {
-            stuckTimer += Time.deltaTime;
+            _stuckTimer += Time.deltaTime;
 
-            if (stuckTimer >= settings.stuckTime)
+            if (_stuckTimer >= _settings.stuckTime)
             {
                 Debug.Log("Happened");
                 _rigidbody.rotation = Quaternion.LookRotation(transform.forward, Vector3.up);
                 //_rigidbody.
                 //_rigidbody.isKinematic = true;
                 //RaycastHit raycastHit;
-                // if (Physics.SphereCast(new Ray(transform.position, -Vector3.up), 100, out raycastHit, 100, groundColliders))
+                // if (Physics.SphereCast(new Ray(transform.position, -Vector3.up), 100, out raycastHit, 100, _groundColliders))
                 //    _rigidbody.MovePosition(raycastHit.point + Vector3.up * 2);
-                stuckTimer = 0;
+                _stuckTimer = 0;
             }
-        }
+        }*/
     }
 }
 

@@ -12,8 +12,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ccc1e2700d551ad4da414d02d4e35d28, type: 3}
   m_Name: Cannon
   m_EditorClassIdentifier: 
-  shellPrefab: {fileID: 0}
-  shellStartSpeed: 50
+  cooldown: 0.5
+  shellPrefab: {fileID: 2934764121585083998, guid: 31da38edbd0e1fd4a860aba81421d03b,
+    type: 3}
+  shellStartSpeed: 11.67
   lerpRotationMultiplier: 10
   minAngleX: 0
   maxAngleX: 80

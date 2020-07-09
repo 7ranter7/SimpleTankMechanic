@@ -5,11 +5,16 @@ using UnityEngine;
 
 public class SimpleTank : MonoBehaviour
 {
-    ICannon cannon;
-    IMovable movable;
+    [SerializeField] private LayerMask _targetsColliders;
+    [SerializeField] private Cursor _cursor;
+    [SerializeField] private LineRenderer _lineRenderer;
+    [SerializeField] private int _lineRendererPoints;
 
 
-    private Vector3 axises;
+    private ICannon _cannon;
+    private IMovable _movable;
+    private Vector3 _axises;
+    private Camera _camera;
 
 
     /// <summary>
@@ -17,9 +22,13 @@ public class SimpleTank : MonoBehaviour
     /// </summary>
     private void Awake()
     {
-        movable = GetComponent<IMovable>();
-        cannon = GetComponentInChildren<ICannon>();
+        _movable = GetComponent<IMovable>();
+        _cannon = GetComponentInChildren<ICannon>();
+        if (_lineRenderer != null) _lineRenderer.positionCount = _lineRendererPoints;
+        _camera = Camera.main;
     }
+
+
 
 
     /// <summary>
@@ -27,34 +36,56 @@ public class SimpleTank : MonoBehaviour
     /// </summary>
     private void FixedUpdate()
     {
-        axises = Vector3.zero;
-        if (cannon != null)
+        _axises = Vector3.zero;
+        if (_cannon != null && _camera != null)
         {
             RaycastHit hit;
-            Debug.Log("WTF");
-            var ray = Camera.main.ScreenPointToRay(new Vector3(Input.mousePosition.x, Input.mousePosition.y, 0));
-            if (Physics.Raycast(ray, out hit, 1000))
-                axises = cannon.Rotate(hit.point);
+            Vector2 screenPos = Input.mousePosition;
+            bool canReach = false;
+            var ray = _camera.ScreenPointToRay(new Vector3(Input.mousePosition.x, Input.mousePosition.y, 0));
+            if (Physics.Raycast(ray, out hit, 1000, _targetsColliders))
+            {
+                _axises = _cannon.Rotate(hit.point);
+                canReach = _cannon.CanReach();
+            }
+
+            if (_cursor != null)
+            {
+                _cursor.SetPosition(screenPos);
+                if (canReach) _cursor.SetActiveColor();
+                else _cursor.SetInactiveColor();
+            }
+            if (_lineRenderer != null)
+            {
+                var points = _cannon.GetPath(_lineRendererPoints);
+                for (int i = 0; i < points.Count; i++)
+                {
+                    _lineRenderer.SetPosition(i, points[i]);
+                }
+
+
+            }
+
 
             if (Input.GetMouseButton(1))
             {
-                if (cannon.CanFire(hit.point))
+                if (_cannon.CanFire())
                 {
-                    cannon.Fire(hit.point);
+                    _cannon.Fire();
                 }
             }
         }
-        if (movable != null)
+        if (_movable != null)
         {
             if (Input.GetKey(KeyCode.W))
-                axises.z = 1;
+                _axises.z = 1;
             if (Input.GetKey(KeyCode.S))
-                axises.z = -1;
+                _axises.z = -1;
             if (Input.GetKey(KeyCode.D))
-                axises.y = 1;
+                _axises.y = 1;
             if (Input.GetKey(KeyCode.A))
-                axises.y = -1;
-            movable.Move(axises);
+                _axises.y = -1;
+            _movable.Move(_axises);
         }
 
     }
